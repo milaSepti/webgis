@@ -190,7 +190,38 @@
       sungai.addData(data);
       map.addLayer(sungai); //sungai ditampilkan ketika halaman dipanggil
     });
-
+    /* GeoJSON Point */
+    var Pendidikan = L.geoJson(null, {
+      pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {
+          icon: L.icon({
+            iconUrl: "https://img.lovepik.com/element/45000/6636.png_300.png", //icon simbol
+            iconSize: [28, 28], //ukuran icon simbol
+            iconAnchor: [14, 28], //penempatan icon simbol
+            popupAnchor: [0, -28], //penempatan popup terhadap icon simbol
+          })
+        });
+      },
+      /* Popup */
+      onEachFeature: function (feature, layer) {
+        if (feature.properties) {
+          /* Variabel untuk memanggil atribut dari data geojson */
+          var content = "Nama: <b>" + feature.properties.Nama + "</b><br>" +
+          "Alamat: <b>"  + feature.properties.Alamat + "</b><br>" +
+            "Rating:" + feature.properties.Rating + "</b><br>" +
+          layer.on({
+            click: function (e) { //Fungsi ketika icon simbol di-klik
+              Pendidikan.bindPopup(content);
+            }
+          });
+        }
+      }
+    });
+    /* memanggil data geojson point */
+    $.getJSON("Pendidikan.geojson", function (data) {
+      Pendidikan.addData(data);
+      map.addLayer(Pendidikan); //titikkabkota ditampilkan ketika halaman dipanggil
+    });
     //akhir Layer Peta
 
     var baseMaps = { //list basemap
@@ -202,10 +233,11 @@
       'Jalan Utama': jalanutama,
       'Admin Desa': admindesa,
       'Sungai': sungai,
+      "Pendidikan": Pendidikan,
 
     };
     var layerControl = L.control.layers(baseMaps, Layers, { collapsed: false });
-    
+
 
     var title = new L.Control();
     title.onAdd = function (map) {
@@ -217,7 +249,7 @@
       this._div.innerHTML = '<h2>Peta Administrasi</h2>D.I.Yogyakarta'
     };
     title.addTo(map);
-layerControl.addTo(map);
+    layerControl.addTo(map);
     L.Control.Watermark = L.Control.extend({
       onAdd: function (map) {
         var img = L.DomUtil.create('img');
